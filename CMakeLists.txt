@@ -4,3 +4,4 @@ project(WordData)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(RandomWords randomWords.cpp)
+add_executable(WordData wordData.cpp word.h)

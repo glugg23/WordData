@@ -13,6 +13,8 @@ int main() {
         words.push_back(line);
     }
 
+    dictionary.close();
+
     //Create a random number generator to pick random element from words
     std::mt19937 rng{std::random_device{}()};
     std::uniform_int_distribution<std::mt19937::result_type> dist(0, words.size() - 1);
@@ -29,6 +31,8 @@ int main() {
             output << words[dist(rng)] << '\n';
         }
     }
+
+    output.close();
 
     return 0;
 }
