@@ -49,12 +49,16 @@ int main() {
     std::cout << "Longest word: " << longestWord << ", at " << longestWord.length() << " characters" << std::endl;
     std::cout << "Shortest word: " << shortestWord << ", at " << shortestWord.length() << " characters" << std::endl;
 
-    double average = total / static_cast<double>(words.size());
-    std::cout << "Average length of words: " << average << std::endl;
+    std::cout << "Average length of words: " << total / static_cast<double>(words.size()) << std::endl;
 
+    Word mostCommon("");
     for(auto &pair : wordMap) {
-        std::cout << pair.second.getWord() << ", count: " << pair.second.getCount() << std::endl;
+        if(pair.second > mostCommon) {
+            mostCommon = pair.second;
+        }
     }
+
+    std::cout << "Most common word: " << mostCommon.getWord() << ", at " << mostCommon.getCount() << " occurrences" << std::endl;
 
     return 0;
 }
