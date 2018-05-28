@@ -70,10 +70,10 @@ int main() {
     randomWords.close();
 
     //Shows error "No matching function" but compiles and runs fine
-    auto longestWordThread = std::async(longestWordFunc, std::ref(wordMap));
-    auto shortestWordThread = std::async(shortestWordFunc, std::ref(wordMap));
-    auto averageThread = std::async(getAverage, std::ref(wordMap));
-    auto mostCommonThread = std::async(mostCommonFunc, std::ref(wordMap));
+    auto longestWordThread = std::async(std::launch::async, longestWordFunc, std::ref(wordMap));
+    auto shortestWordThread = std::async(std::launch::async, shortestWordFunc, std::ref(wordMap));
+    auto averageThread = std::async(std::launch::async, getAverage, std::ref(wordMap));
+    auto mostCommonThread = std::async(std::launch::async, mostCommonFunc, std::ref(wordMap));
 
     //Get the value back from each future
     std::string longestWord = longestWordThread.get();
