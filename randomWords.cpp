@@ -3,6 +3,8 @@
 #include <vector>
 #include <random>
 
+#define NUM_OF_WORDS 1000000
+
 int main() {
     //Read in all words from dictionary file
     std::ifstream dictionary("dictionary.txt");
@@ -22,9 +24,9 @@ int main() {
     std::ofstream output("random.txt");
 
     //Write 1 million random words to file
-    for(int i = 0; i < 1000000; ++i) {
+    for(int i = 0; i < NUM_OF_WORDS; ++i) {
         //Dirty fix to stop the last line being a newline
-        if(i == 1000000 - 1) {
+        if(i == NUM_OF_WORDS - 1) {
             output << words[dist(rng)];
 
         } else {
