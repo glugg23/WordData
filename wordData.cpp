@@ -5,7 +5,7 @@
 #include <thread>
 #include <future>
 
-#include "word.h"
+//#include "word.h"
 
 void longestWordFunc(std::promise<std::string> &&longestWord, const std::vector<std::string> &words) {
     std::string currentWord;
@@ -42,6 +42,17 @@ void getAverage(std::promise<double> &&average, const std::vector<std::string> &
     average.set_value(static_cast<double>(total) / words.size());
 }
 
+void mostCommonFunc(std::promise<std::tuple<std::string, int>> &&mostCommon, const std::map<std::string, int> &words) {
+    std::tuple<std::string, int> mostCommonTuple("", 0);
+    for(auto &pair : words) {
+        if(pair.second > std::get<int>(mostCommonTuple)) {
+            mostCommonTuple = pair;
+        }
+    }
+
+    mostCommon.set_value(mostCommonTuple);
+}
+
 int main() {
     std::ifstream randomWords("random.txt");
     std::vector<std::string> words;
@@ -53,8 +64,6 @@ int main() {
     }
 
     randomWords.close();
-
-    std::map<std::string, Word> wordMap;
 
     //Make a promise to return a string
     std::promise<std::string> longestWordPromise;
@@ -71,39 +80,41 @@ int main() {
     auto averageFuture = averagePromise.get_future();
     std::thread averageThread(getAverage, std::move(averagePromise), std::ref(words));
 
+    std::map<std::string, int> wordMap;
+
+    //Find map of all unique words with their count
     for(auto &word : words) {
         //If word doesn't exist, add it to the map
         if(wordMap.count(word) == 0) {
-            wordMap.insert(std::make_pair(word, Word(word)));
+            wordMap.insert(std::make_pair(word, 1));
 
         } else {
             //Otherwise increment the value of that word
-            wordMap.at(word).increment();
+            wordMap.at(word)++;
         }
     }
+
+    std::promise<std::tuple<std::string, int>> mostCommonPromise;
+    auto mostCommonFuture = mostCommonPromise.get_future();
+    std::thread mostCommonThread(mostCommonFunc, std::move(mostCommonPromise), std::ref(wordMap));
 
     longestWordThread.join();
     shortestWordThread.join();
     averageThread.join();
+    mostCommonThread.join();
 
     //Get the value back from each future
     std::string longestWord = longestWordFuture.get();
     std::string shortestWord = shortestWordFuture.get();
     double average = averageFuture.get();
+    std::tuple<std::string, int> mostCommon = mostCommonFuture.get();
 
     std::cout << "Longest word: " << longestWord << ", at " << longestWord.length() << " characters" << std::endl;
     std::cout << "Shortest word: " << shortestWord << ", at " << shortestWord.length() << " characters" << std::endl;
 
     std::cout << "Average length of words: " << average << std::endl;
 
-    Word mostCommon("");
-    for(auto &pair : wordMap) {
-        if(pair.second > mostCommon) {
-            mostCommon = pair.second;
-        }
-    }
-
-    std::cout << "Most common word: " << mostCommon.getWord() << ", at " << mostCommon.getCount() << " occurrences" << std::endl;
+    std::cout << "Most common word: " << std::get<std::string>(mostCommon) << ", at " << std::get<int>(mostCommon) << " occurrences" << std::endl;
 
     return 0;
 }
